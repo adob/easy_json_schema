@@ -4,6 +4,8 @@ easy_json_schema is a notation for describing JSON that serves as both documenta
 
 ## Usage
 
+check out the demo at [http://adob.github.com/easy_json_schema/](http://adob.github.com/easy_json_schema/)
+
 1. define your schema
 2. enter your input
 3. specify validate against

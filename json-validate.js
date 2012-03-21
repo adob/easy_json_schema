@@ -108,24 +108,25 @@ json_validate = (function () {
                         return true;
                 }
             }
-            for (var item in object) 
+            for (var item in schema) 
             {
-                if (object.hasOwnProperty(item))
+                if (schema.hasOwnProperty(item))
                 {
-                    if (!schema.hasOwnProperty(item)) {
-                        var r = "not allowed here";
-                    }
-                    else {
-                        var constraint = schema[item];
-                        var value = object[item];
-                        var r = validate(value, constraint);
-                    }
+                    var constraint = schema[item];
+                    var value = object[item];
+                    var r = validate(value, constraint);
                     
                     if (r !== true) {
                         error = true;
                         errors[item] = r;
                     }
-                    
+                }
+            }
+            
+            for (var item in object) {
+                if (object.hasOwnProperty(item) && !schema.hasOwnProperty(item)) {
+                    error = true;
+                    errors[item] = "not allowed here";
                 }
             }
         

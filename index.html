@@ -1,1 +1,198 @@
-My GitHub Page
+<!DOCTYPE html>
+<script src=external/prototype.js></script>
+<script src=external/beautify.js></script>
+<script src=json-validate.js></script>
+
+<script>
+    function do_validate() {
+        try {
+            eval("with (json_validate.decls) { " + $('txt-schema').value + " } ");
+        } catch (e) { 
+            $('txt-output').value += "Error while reading schema: "+e + "\n"
+        }
+        
+        var against = $('validate-against').value;
+        
+      try {
+            var data = JSON.parse($('txt-data').value);
+            var r = json_validate(data, window[against]);
+            $('txt-output').value += (r === null ? "OK" : 
+                js_beautify(JSON.stringify(r))) + "\n";
+                
+       } catch (e) { $('txt-output').value += e + "\n"}
+    }
+</script>
+
+<style>
+    #schema {
+        width: 60%;
+        height: 600px;
+        display: inline-block;
+        padding: 5px;
+    }
+    
+    #schema textarea {
+        width: 95%;
+        height: 95%;
+    }
+    
+    
+    #data {
+        width: 35%;
+        height: 600px;
+        display: inline-block;
+            
+    }
+    #data textarea {
+        width: 95%;
+        height: 95%;
+    }
+    
+    #txt-output {
+        width: 95%;
+        height: 300px;
+    }
+</style>
+
+<div>
+<button onclick=do_validate()>validate</button> against <input id=validate-against value=darp_schema>
+</div>
+
+<div id=schema>
+<div>
+Schema:
+</div>
+<textarea id=txt-schema>
+TimeOfDay = integer;
+Duration  = integer;
+Distance  = float;
+MixedID   = mixed (number, string, object);
+Location  = [ float, float, optional (MixedID) ];
+
+
+Vehicle = {
+    id:              MixedID,
+    
+    num_seats:       integer,
+    num_wheelchairs: integer,
+    start_time:      TimeOfDay,
+    stop_time:       TimeOfDay,
+    depot:           Location
+}
+
+Order = {
+    id:            MixedID,
+    
+    pickup_point:  Location,
+    dropoff_point: Location,
+    
+    pickup_time:   TimeOfDay,
+    dropoff_time:  TimeOfDay,
+    
+    pickup_ut:     Duration,
+    pickup_lt:     Duration,
+    
+    load_time:     Duration,
+    unload_time:   Duration,
+    
+    mobility:      enum ("ambulatory", "wheelchair")
+}
+
+darp_schema = {
+    vehicles: [ of (Vehicle) ],
+    orders:   [ of (Order) ],
+    
+    routing_config: {
+        travel_time_multiplier: float
+    },
+    
+    darp_config: {
+        max_travel_time_multiplier: optional (float),
+        max_travel_time_increment:  optional (float)
+    }
+}
+
+</textarea>
+</div>
+
+<div id=data>
+<div>
+Input Data:
+</div>
+<textarea id=txt-data>
+{
+    "darp_config": {
+        "max_travel_time_increment": 300, 
+        "max_travel_time_multiplier": 2
+    }, 
+    "orders": [
+        {
+            "dropoff_point": [
+                43.089075, 
+                -87.899112, 
+                "D"
+            ], 
+            "dropoff_time": 46800, 
+            "id": "order 1", 
+            "load_time": 120, 
+            "pickup_lt": 900, 
+            "pickup_point": [
+                43.089137, 
+                -87.90542, 
+                "A"
+            ], 
+            "pickup_time": 43200, 
+            "pickup_ut": 900, 
+            "unload_time": 120,
+            
+            "mobility": "ambulatory"
+        }, 
+        {
+            "dropoff_point": [
+                43.089153, 
+                -87.901708, 
+                "C"
+            ], 
+            "dropoff_time": 48600, 
+            "id": 2, 
+            "load_time": 120, 
+            "pickup_lt": 900, 
+            "pickup_point": [
+                43.089161, 
+                -87.903156, 
+                "B"
+            ], 
+            "pickup_time": 45000, 
+            "pickup_ut": 900, 
+            "unload_time": 120,
+            
+            "mobility": "wheelchair"
+        }
+    ], 
+    "routing_config": {
+        "travel_time_multiplier": 1.5
+    }, 
+    "vehicles": [
+        {
+            "depot": [
+                43.084375, 
+                -87.907442
+            ], 
+            "id": "Vehicle 1", 
+            "num_seats": 5, 
+            "num_wheelchairs": 5, 
+            "start_time": 10800, 
+            "stop_time": 64800
+        }
+    ]
+}
+</textarea>
+</div>
+
+
+<div>
+<div>
+    Output:
+</div>
+<textarea id=txt-output></textarea>
+<div>

@@ -34,7 +34,7 @@ json_validate = (function () {
         }
     };
     
-    function enum() {
+    function enumeration() {
         var args = arguments;
 
         return function(x) 
@@ -108,17 +108,19 @@ json_validate = (function () {
                         return true;
                 }
             }
-            
-        
-            
-            for (var item in schema) 
+            for (var item in object) 
             {
-                //if (item == "depot") debugger;
-                if (schema.hasOwnProperty(item))
+                if (object.hasOwnProperty(item))
                 {
-                    var constraint = schema[item];
-                    var value = object[item];
-                    var r = validate(value, constraint);
+                    if (!schema.hasOwnProperty(item)) {
+                        var r = "not allowed here";
+                    }
+                    else {
+                        var constraint = schema[item];
+                        var value = object[item];
+                        var r = validate(value, constraint);
+                    }
+                    
                     if (r !== true) {
                         error = true;
                         errors[item] = r;
@@ -126,6 +128,7 @@ json_validate = (function () {
                     
                 }
             }
+        
             
             if (error)
                 return errors;
@@ -160,7 +163,7 @@ json_validate = (function () {
         object: object,
         optional: optional,
         of: of,
-        enum: enum
+        enumeration: enumeration
     }
     
     return ret_fun;
